@@ -11,5 +11,8 @@
     "url": "git+https://github.com/Gazal100/fragments.git"
   },
   "author": "Gazal",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "prettier": "3.3.3"
+  }
 }
