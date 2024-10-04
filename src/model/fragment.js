@@ -16,7 +16,27 @@ const {
 
 class Fragment {
   constructor({ id, ownerId, created, updated, type, size = 0 }) {
-    // TODO
+    if (!ownerId) {
+      throw new Error('Fragment missing ownerId!');
+    }
+    if (!type) {
+      throw new Error('Fragment missing type!');
+    }
+    if (!Fragment.isSupportedType(type)) {
+      throw new Error('Unsupported Fragment type!');
+    }
+    if (typeof size !== 'number' || size < 0) {
+      throw new Error('Fragment size is invalid!');
+    }
+
+    this.id = id || randomUUID();
+    this.ownerId = ownerId;
+    this.created = created || new Date().toString();
+    this.updated = updated || new Date().toString();
+    this.type = type;
+    this.size = size;
+
+    this.save();
   }
 
   /**
@@ -26,7 +46,7 @@ class Fragment {
    * @returns Promise<Array<Fragment>>
    */
   static async byUser(ownerId, expand = false) {
-    // TODO
+    return listFragments(ownerId, expand);
   }
 
   /**
@@ -36,7 +56,7 @@ class Fragment {
    * @returns Promise<Fragment>
    */
   static async byId(ownerId, id) {
-    // TODO
+    return readFragment(ownerId, id);
   }
 
   /**
@@ -46,7 +66,7 @@ class Fragment {
    * @returns Promise<void>
    */
   static delete(ownerId, id) {
-    // TODO
+    return deleteFragment(ownerId, id);
   }
 
   /**
@@ -54,7 +74,7 @@ class Fragment {
    * @returns Promise<void>
    */
   save() {
-    // TODO
+    return writeFragment(this.ownerId, this.id, this.data);
   }
 
   /**
@@ -62,7 +82,7 @@ class Fragment {
    * @returns Promise<Buffer>
    */
   getData() {
-    // TODO
+    return readFragmentData(this.ownerId, this.id);
   }
 
   /**
@@ -71,7 +91,13 @@ class Fragment {
    * @returns Promise<void>
    */
   async setData(data) {
-    // TODO
+    if (!Buffer.isBuffer(data)) {
+      throw new Error(`Data is not a Buffer!`);
+    }
+
+    this.updated = new Date().toString();
+    this.size = data.length;
+    return writeFragmentData(this.ownerId, this.id, data);
   }
 
   /**
@@ -89,7 +115,7 @@ class Fragment {
    * @returns {boolean} true if fragment's type is text/*
    */
   get isText() {
-    // TODO
+    return this.type.startsWith('text/');
   }
 
   /**
@@ -97,7 +123,7 @@ class Fragment {
    * @returns {Array<string>} list of supported mime types
    */
   get formats() {
-    // TODO
+    return this.type.startsWith('text/plain') ? ['text/plain'] : [];
   }
 
   /**
@@ -106,7 +132,21 @@ class Fragment {
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
-    // TODO
+    let validType = [
+      'text/plain',
+      'text/plain; charset=utf-8',
+      'text/markdown',
+      'text/html',
+      'application/json',
+      'image/png',
+      'image/jpeg',
+      'image/webp',
+    ];
+
+    if (validType.includes(value)) {
+      return true;
+    }
+    return false;
   }
 }
 
