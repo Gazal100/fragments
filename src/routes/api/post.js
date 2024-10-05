@@ -22,7 +22,14 @@ module.exports = async (req, res) => {
     createSuccessResponse(
       res.status(201).json({
         status: 'ok',
-        fragments: newFragment,
+        fragments: {
+          id: newFragment.id,
+          ownerId: newFragment.ownerId,
+          created: newFragment.created,
+          update: newFragment.update,
+          type: newFragment.type,
+          size: newFragment.size,
+        },
       })
     );
   }
