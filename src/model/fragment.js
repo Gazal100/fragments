@@ -31,12 +31,10 @@ class Fragment {
 
     this.id = id || randomUUID();
     this.ownerId = ownerId;
-    this.created = created || new Date().toString();
-    this.updated = updated || new Date().toString();
+    this.created = created || new Date().toISOString();
+    this.updated = updated || new Date().toISOString();
     this.type = type;
     this.size = size;
-
-    this.save();
   }
 
   /**
@@ -46,7 +44,12 @@ class Fragment {
    * @returns Promise<Array<Fragment>>
    */
   static async byUser(ownerId, expand = false) {
-    return listFragments(ownerId, expand);
+    const fragments = await listFragments(ownerId, expand);
+    if (fragments && fragments.length) {
+      return fragments;
+    } else {
+      return [];
+    }
   }
 
   /**
@@ -56,7 +59,19 @@ class Fragment {
    * @returns Promise<Fragment>
    */
   static async byId(ownerId, id) {
-    return readFragment(ownerId, id);
+    const fragment = await readFragment(ownerId, id);
+    if (!fragment) {
+      throw new Error('Fragment not Found!');
+    }
+    const newFragment = new Fragment({
+      id: fragment.id,
+      ownerId: fragment.ownerId,
+      created: fragment.created,
+      updated: fragment.updated,
+      type: fragment.type,
+      size: fragment.size,
+    });
+    return Promise.resolve(newFragment);
   }
 
   /**
@@ -74,7 +89,8 @@ class Fragment {
    * @returns Promise<void>
    */
   save() {
-    return writeFragment(this.ownerId, this.id, this.data);
+    this.updated = new Date().toISOString();
+    return writeFragment(this);
   }
 
   /**
@@ -95,7 +111,7 @@ class Fragment {
       throw new Error(`Data is not a Buffer!`);
     }
 
-    this.updated = new Date().toString();
+    this.updated = new Date().toISOString();
     this.size = data.length;
     return writeFragmentData(this.ownerId, this.id, data);
   }

@@ -1,15 +1,26 @@
 // src/routes/api/get.js
 
 const { createSuccessResponse } = require('../../response');
+const { Fragment } = require('../../model/fragment');
 
 /**
  * Get a list of fragments for the current user
  */
-module.exports = (req, res) => {
-  // TODO: this is just a placeholder. To get something working, return an empty array...
+module.exports = async (req, res) => {
+
+  let fragment_list = []; 
+  const expand = req.query.expand;
+
+  if (expand == 1) {
+    fragment_list = await Fragment.byUser(req.user, true);
+  } else {
+    fragment_list = await Fragment.byUser(req.user, false);
+  }
+  
   res.status(200).json(
     createSuccessResponse({
-      fragments: [], 
+      fragments: fragment_list, 
     })
   );
 };
+
