@@ -41,16 +41,16 @@ FROM node:20-alpine3.18@sha256:53108f67824964a573ea435fed258f6cee4d88343e9859a99
 WORKDIR /app
 
 # Copying node_modules from the dependencies stage with correct ownership
-COPY --from=dependencies --chown=node:node /app/node_modules /app/node_modules
+COPY --from=dependencies /app/node_modules /app/node_modules
 
 # We run our service on port 8080
 EXPOSE 8080
 
 # Copy src/
-COPY --chown=node:node ./src ./src
+COPY ./src ./src
 
 # Copy our HTPASSWD file
-COPY --chown=node:node ./tests/.htpasswd ./tests/.htpasswd
+COPY ./tests/.htpasswd ./tests/.htpasswd
 
 USER node
 
