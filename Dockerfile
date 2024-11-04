@@ -55,4 +55,4 @@ COPY ./tests/.htpasswd ./tests/.htpasswd
 USER node
 
 # Run the server
-CMD npm start
+CMD ["npm", "start"]
