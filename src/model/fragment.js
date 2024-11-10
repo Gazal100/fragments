@@ -111,9 +111,13 @@ class Fragment {
       throw new Error(`Data is not a Buffer!`);
     }
 
+    // Update metadata
     this.updated = new Date().toISOString();
     this.size = data.length;
-    return writeFragmentData(this.ownerId, this.id, data);
+
+    // Save data and metadata
+    await writeFragmentData(this.ownerId, this.id, data);
+    await this.save();
   }
 
   /**

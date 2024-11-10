@@ -4,8 +4,11 @@ const { Fragment } = require('../../model/fragment');
 
 module.exports = async (req, res) => {
   if (!Buffer.isBuffer(req.body)) {
-    res.status(415).json(createErrorResponse(415, 'Unsupported Media Type'));
-  } else {
+    return res.status(415).json(createErrorResponse(415, 'Unsupported Media Type'));
+  }
+
+  try {
+    // Create a new fragment with the provided data
     const newFragment = new Fragment({
       id: crypto.randomBytes(16).toString('hex'),
       ownerId: req.user || null,
@@ -14,23 +17,28 @@ module.exports = async (req, res) => {
       type: req.headers['content-type'],
       size: Number(req.headers['content-length']),
     });
-    await newFragment.save();
-    await newFragment.setData(req.body);
-    const location = `${req.protocol}://${req.hostname}:8080/v1${req.url}/${newFragment.id}`;
-    res.location(location);
 
-    createSuccessResponse(
-      res.status(201).json({
-        status: 'ok',
-        fragments: {
-          id: newFragment.id,
-          ownerId: newFragment.ownerId,
-          created: newFragment.created,
-          update: newFragment.update,
-          type: newFragment.type,
-          size: newFragment.size,
-        },
-      })
-    );
+    await newFragment.save(); // Save the fragment
+    await newFragment.setData(req.body); // Set the data for the fragment
+
+    const location = `${req.protocol}://${req.hostname}:8080/v1${req.url}/${newFragment.id}`;
+    res.location(location); // Set the Location header
+
+    // Respond with 201 Created and include fragment data in the response body
+    return res.status(201).json(createSuccessResponse({
+      status: 'ok',
+      fragments: {
+        id: newFragment.id,
+        ownerId: newFragment.ownerId,
+        created: newFragment.created,
+        update: newFragment.update,
+        type: newFragment.type,
+        size: newFragment.size,
+      },
+    }));
+  } catch (error) {
+    // If an error occurs during save or setData, return a 500 response
+    console.error('Error creating fragment:', error);
+    return res.status(500).json(createErrorResponse(500, 'Internal Server Error'));
   }
 };
