@@ -1,5 +1,6 @@
 const { Fragment } = require('../../model/fragment');
 const { createErrorResponse, createSuccessResponse } = require('../../response');
+const md = require('markdown-it')();
 
 module.exports = async (req, res) => {
   let id = req.params.id;
@@ -14,31 +15,51 @@ module.exports = async (req, res) => {
     extension = null;
   }
 
-  if (extension && extension !== 'txt') {
-    return createErrorResponse(
-      res.status(415).json({
-        message: 'Unsupported Media type, Only (text/plain) is supported[use .txt]',
-      })
-    );
-  }
+  try {
+    var format = null;
+    const fragment_data = await Fragment.byId(user, id);
 
-  const fragment_data = await Fragment.byId(user, id);
+    let type = fragment_data.mimeType;
 
-  if (fragment_data) {
-    const dataResult = await fragment_data.getData();
+    if (extension === 'html') {
+      format = 'text/html';
+    } else if (extension === 'txt') {
+      format = 'text/plain';
+    } else if ('text' + extension === type) {
+      format = type;
+    } else if (extension) {
+      format = 'invalid';
+    }
 
-    if (dataResult) {
-      res.setHeader('Content-Type', 'text/plain');
-      return createSuccessResponse(res.status(200).send(dataResult));
-    } else {
+    if (!fragment_data.formats.includes(format) && format != null) {
       return createErrorResponse(
-        res.status(500).json({
-          code: 500,
-          message: 'No data Found',
+        res.status(415).json({
+          message: 'Invalid type conversion, only markdown to HTML is supported[as of now]',
         })
       );
+    } else {
+      try {
+        if (extension === 'html' && fragment_data.mimeType === 'text/markdown') {
+          type = 'text/html';
+        }
+        const raw_data = await fragment_data.getData();
+        const data = convertData(raw_data, type);
+
+        res.setHeader('Content-Type', type);
+
+        return createSuccessResponse(res.status(200).send(data));
+      } catch (err) {
+        console.error('Error fetching fragment data:', err);
+        return createErrorResponse(
+          res.status(500).json({
+            code: 500,
+            message: 'No data Found',
+          })
+        );
+      }
     }
-  } else {
+  } catch (err) {
+    console.error('Error fetching fragment:', err);
     return createErrorResponse(
       res.status(404).json({
         message: 'Fragment not Found',
@@ -46,3 +67,13 @@ module.exports = async (req, res) => {
     );
   }
 };
+
+function convertData(data, contentType) {
+  if (contentType === 'text/html') {
+    return md.render(data.toString());
+  } else if (contentType === 'text/plain') {
+    return data.toString();
+  } else {
+    return data;
+  }
+}

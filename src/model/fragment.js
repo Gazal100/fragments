@@ -143,7 +143,17 @@ class Fragment {
    * @returns {Array<string>} list of supported mime types
    */
   get formats() {
-    return this.type.startsWith('text/plain') ? ['text/plain'] : [];
+    const plain = ['text/plain'];
+    const markdownToHtml = ['text/markdown', 'text/plain', 'text/html'];
+
+    // Check if the MIME type is 'text/markdown'
+    if (this.mimeType === 'text/plain') {
+      return plain;
+    } else if (this.mimeType === 'text/markdown') {
+      return markdownToHtml;
+    } else {
+      return [];
+    }
   }
 
   /**
