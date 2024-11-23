@@ -11,7 +11,7 @@ LABEL maintainer="Gazal Garg <ggarg4@myseneca.ca>"
 LABEL description="Fragments node.js microservice"
 
 # We default to use port 8080 in our service
-ENV PORT=8080
+ENV PORT=80
 
 # Reduce npm spam when installing within Docker
 # https://docs.npmjs.com/cli/v8/using-npm/config#loglevel
@@ -38,13 +38,15 @@ RUN npm install --production
 
 FROM node:20-alpine3.18@sha256:53108f67824964a573ea435fed258f6cee4d88343e9859a99d356883e71b490c AS build
 
+USER root
+
 WORKDIR /app
 
 # Copying node_modules from the dependencies stage with correct ownership
 COPY --from=dependencies /app /app
 
 # We run our service on port 8080
-EXPOSE 8080
+EXPOSE 80
 
 # Copy src/
 COPY ./src ./src
