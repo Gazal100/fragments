@@ -21,7 +21,7 @@ jsonpath "$.fragments.ownerId" matches "^[0-9a-fA-F]+$"
 # Basic check for the presence of created and updated date strings.
 # You could also write a regex for this and use matches
 jsonpath "$.fragments.created" isString
-# jsonpath "$.fragments.updated" isString
+jsonpath "$.fragments.updated" isString
 jsonpath "$.fragments.type" == "text/plain; charset=utf-8"
 # 19 is the length of our fragment data: 'This is a fragment!'
 jsonpath "$.fragments.size" == 19

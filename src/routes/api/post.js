@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
       id: crypto.randomBytes(16).toString('hex'),
       ownerId: req.user || null,
       created: new Date().toISOString(),
-      update: new Date().toISOString(),
+      updated: new Date().toISOString(),
       type: req.headers['content-type'],
       size: Number(req.headers['content-length']),
     });
@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
         id: newFragment.id,
         ownerId: newFragment.ownerId,
         created: newFragment.created,
-        update: newFragment.update,
+        updated: newFragment.updated,
         type: newFragment.type,
         size: newFragment.size,
       },
