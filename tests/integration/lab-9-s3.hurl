@@ -34,7 +34,7 @@ user1@email.com:password1
 
 # 4. Confirm that the server returns a 200, that the type of the fragment is text/plain, and that the body is equal to Hello S3!
 HTTP/1.1 200
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 [Asserts]
 body == "Hello S3!"
 
