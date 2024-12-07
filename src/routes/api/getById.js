@@ -65,7 +65,6 @@ function getContentType(extension, mimeType) {
     return 'Invalid';
   }
 
-  // Check if the extension is valid, otherwise, use the provided MIME type
   return extensionToContentType[extension] || mimeType;
 }
 
