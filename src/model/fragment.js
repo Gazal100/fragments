@@ -143,14 +143,17 @@ class Fragment {
    * @returns {Array<string>} list of supported mime types
    */
   get formats() {
-    const plain = ['text/plain'];
-    const markdownToHtml = ['text/markdown', 'text/plain', 'text/html'];
-
     // Check if the MIME type is 'text/markdown'
     if (this.mimeType === 'text/plain') {
-      return plain;
+      return ['text/plain'];
     } else if (this.mimeType === 'text/markdown') {
-      return markdownToHtml;
+      return ['text/markdown', 'text/plain', 'text/html'];
+    } else if (this.mimeType === 'text/html') {
+      return ['text/html', 'text/plain'];
+    } else if (this.mimeType === 'application/json') {
+      return ['application/json', 'text/plain'];
+    } else if (['image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(this.mimeType)) {
+      return ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
     } else {
       return [];
     }

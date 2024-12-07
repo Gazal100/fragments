@@ -158,8 +158,6 @@ async function listFragments(ownerId, expand = false) {
 }
 
 async function deleteFragment(ownerId, id) {
-  // Create the PUT API params from our details
-
   const params = {
     Bucket: process.env.AWS_S3_BUCKET_NAME,
     // Our key will be a mix of the ownerID and fragment id, written as a path
@@ -169,12 +167,11 @@ async function deleteFragment(ownerId, id) {
     TableName: process.env.AWS_DYNAMODB_TABLE_NAME,
     Key: { ownerId, id },
   };
-  // Create a GET Object command to send to S3
+
   const command = new DeleteObjectCommand(params);
   const command2 = new DeleteCommand(params2);
 
   try {
-    // Delete the object from the Amazon S3 bucket.
     await s3Client.send(command);
   } catch (err) {
     const { Bucket, Key } = params;
