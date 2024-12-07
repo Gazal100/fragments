@@ -44,7 +44,7 @@ module.exports = async (req, res) => {
     return createErrorResponse(
       res.status(404).json({
         code: 404,
-        message: 'No data Found',
+        message: 'Fragment not Found',
       })
     );
   }
